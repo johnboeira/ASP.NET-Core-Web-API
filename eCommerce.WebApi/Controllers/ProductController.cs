@@ -1,42 +1,79 @@
-﻿using eCommerce.WebApi.Models;
+﻿using eCommerce.WebApi.Infra;
+using eCommerce.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.WebApi.Controllers;
 
 [ApiController]
-public class ProductController : ControllerBase
+//[Route("api/[controller]")]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+public class ProductController(ProductRepository productRepository) : ControllerBase
 {
-    [HttpGet("{id:Guid}")]
-    public async Task<IActionResult> GetById([FromRoute] Guid id)
+    private readonly ProductRepository _productRepository = productRepository;
+
+    [HttpGet]
+    [Route(ApiEndpoints.Movies.Get)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductDto>> GetById([FromRoute] Guid id)
     {
+        var product = await _productRepository.GetByIdAsync(id);
+
+        if (product is null)
+            return NotFound();
+
+        return Ok(product);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [Route(ApiEndpoints.Movies.GetAll)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
     {
+        var product = await _productRepository.GetAllAsync();
+
+        return Ok(product);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProduct([FromBody] Product product)
+    [Route(ApiEndpoints.Movies.Create)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto product)
     {
-        return CreatedAtAction();
+        var createdProduct = await _productRepository.CreateAsync(product);
+
+        return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id } , createdProduct);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateProduct([FromBody] Product product)
+    [Route(ApiEndpoints.Movies.Update)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateProduct([FromBody] ProductDto product)
     {
-        return CreatedAtAction();
+        var productToUpdate = await _productRepository.GetByIdAsync(product.Id);
+
+        if (productToUpdate is null)
+            return NotFound();
+
+        productToUpdate.Update(product.Name, product.Price);
+
+        return NoContent();
     }
 
-    [HttpPatch]
-    public async Task<IActionResult> UpdateProduct([FromBody] Product product)
-    {
-        return CreatedAtAction();
-    }
-
-    [HttpDelete("{id:Guid}")]
+    [HttpDelete]
+    [Route(ApiEndpoints.Movies.Delete)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
     {
-        return CreatedAtAction();
+        var productToDelete = await _productRepository.GetByIdAsync(id);
+
+        if (productToDelete is null)
+            return NotFound();
+
+        await _productRepository.DeleteAsync(productToDelete);
+
+        return NoContent();
     }
 }
