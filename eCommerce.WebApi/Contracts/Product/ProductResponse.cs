@@ -1,8 +1,8 @@
-﻿namespace eCommerce.WebApi.Models;
+﻿namespace eCommerce.WebApi.Contracts.Product;
 
-public class ProductDto
+public class ProductResponse
 {
-    public ProductDto(Guid id, string name, decimal price)
+    public ProductResponse(Guid id, string name, decimal price)
     {
         Id = id;
         Name = name;

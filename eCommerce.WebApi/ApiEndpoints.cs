@@ -17,4 +17,11 @@ public static class ApiEndpoints
         public const string Review = $"{Base}/{{id:guid}}/reviews";
         public const string DeleteReview = $"{Base}/{{id:guid}}/reviews";
     }
+
+    public static class Authentication
+    {
+        private const string Base = $"{ApiBase}/authentication";
+
+        public const string Login = Base;
+    }
 }

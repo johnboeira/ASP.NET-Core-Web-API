@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace eCommerce.WebApi.Models;
+namespace eCommerce.WebApi.Contracts.Product;
 
-public record ProductCreateDto(
+public record ProductCreateRequest(
     [Required] string Name,
     [Required] decimal Price);

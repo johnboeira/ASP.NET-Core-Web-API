@@ -1,5 +1,5 @@
-﻿using eCommerce.WebApi.Infra;
-using eCommerce.WebApi.Models;
+﻿using eCommerce.WebApi.Contracts.Product;
+using eCommerce.WebApi.Infra;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.WebApi.Controllers;
@@ -15,7 +15,7 @@ public class ProductController(ProductRepository productRepository) : Controller
     [Route(ApiEndpoints.Movies.Get)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProductDto>> GetById([FromRoute] Guid id)
+    public async Task<ActionResult<ProductResponse>> GetById([FromRoute] Guid id)
     {
         var product = await _productRepository.GetByIdAsync(id);
 
@@ -28,7 +28,7 @@ public class ProductController(ProductRepository productRepository) : Controller
     [HttpGet]
     [Route(ApiEndpoints.Movies.GetAll)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAll()
     {
         var product = await _productRepository.GetAllAsync();
 
@@ -38,18 +38,18 @@ public class ProductController(ProductRepository productRepository) : Controller
     [HttpPost]
     [Route(ApiEndpoints.Movies.Create)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto product)
+    public async Task<IActionResult> CreateProduct([FromBody] ProductCreateRequest product)
     {
         var createdProduct = await _productRepository.CreateAsync(product);
 
-        return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id } , createdProduct);
+        return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
     }
 
     [HttpPut]
     [Route(ApiEndpoints.Movies.Update)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProduct([FromBody] ProductDto product)
+    public async Task<IActionResult> UpdateProduct([FromBody] ProductResponse product)
     {
         var productToUpdate = await _productRepository.GetByIdAsync(product.Id);
 
